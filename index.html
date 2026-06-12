@@ -23,7 +23,19 @@
   --line:#232321;
   --serif:'Fraunces',serif;
   --mono:'JetBrains Mono',monospace;
+  --surface:#111110;
 }
+[data-theme="light"]{
+  --ink:#F5F0EC;
+  --paper:#1A1A18;
+  --paper-dim:#6A6A66;
+  --paper-faint:#9A9A96;
+  --lime:#8FBF1E;
+  --line:#D4D0CC;
+  --surface:#E8E4DF;
+}
+[data-theme="light"] nav{mix-blend-mode:normal}
+[data-theme="light"] .work-thumb h3{color:#E8E4DF}
 *{margin:0;padding:0;box-sizing:border-box}
 html{scrollbar-width:thin;scrollbar-color:var(--line) var(--ink)}
 body{
@@ -71,6 +83,12 @@ nav{
 }
 .nav-right a:hover::after{width:100%}
 .nav-clock{font-size:10px;letter-spacing:.1em;color:var(--paper);opacity:.5}
+.theme-btn{
+  background:none;border:1px solid var(--paper-faint);border-radius:20px;
+  color:var(--paper);font-family:var(--mono);font-size:10px;letter-spacing:.1em;
+  padding:4px 12px;cursor:pointer;transition:border-color .3s,color .3s;
+}
+.theme-btn:hover{border-color:var(--lime);color:var(--lime)}
 
 /* ============ HERO ============ */
 .hero{
@@ -138,13 +156,13 @@ section{position:relative}
 
 /* ============ WORKS — HORIZONTAL RAIL ============ */
 .works{padding:110px 0 0}
-.works-pin{overflow:hidden}
+.works-pin{overflow-x:hidden;overflow-y:visible}
 .works-track{
   display:flex;gap:28px;padding:0 32px;will-change:transform;width:max-content;
 }
 .work{
   position:relative;flex:0 0 min(680px,82vw);
-  border:1px solid var(--line);background:#111110;
+  border:1px solid var(--line);background:var(--surface);
   overflow:hidden;
 }
 .work-thumb{
@@ -211,7 +229,7 @@ section{position:relative}
   grid-template-columns:repeat(12,1fr);grid-auto-rows:minmax(120px,auto);
 }
 .tile{
-  border:1px solid var(--line);background:#111110;padding:26px 28px;
+  border:1px solid var(--line);background:var(--surface);padding:26px 28px;
   position:relative;overflow:hidden;
   transition:border-color .3s;
 }
@@ -337,6 +355,7 @@ section{position:relative}
     <a href="#works" data-link>Works</a>
     <a href="#about" data-link>About</a>
     <a href="#contact" data-link>Contact</a>
+    <button class="theme-btn" id="themeToggle" data-link aria-label="Toggle theme">[Light]</button>
     <span class="nav-clock" id="clock">SI — 00:00</span>
   </div>
 </nav>
@@ -369,12 +388,12 @@ section{position:relative}
 
 <!-- ============ SELECTED WORKS ============ -->
 <section class="works" id="works">
-  <div class="sec-head">
-    <span class="sec-index">01</span>
-    <h2 class="sec-title">Selected <em>works</em></h2>
-    <span class="sec-rule"></span>
-  </div>
   <div class="works-pin" id="worksPin">
+    <div class="sec-head">
+      <span class="sec-index">01</span>
+      <h2 class="sec-title">Selected <em>works</em></h2>
+      <span class="sec-rule"></span>
+    </div>
     <div class="works-track" id="worksTrack">
 
       <a class="work" href="https://nuffyofc.github.io/pocketmentorxyz/" target="_blank" rel="noopener" data-view>
@@ -551,6 +570,7 @@ if (st && fine && !reduced) {
     current += (target - current) * ease;
     if (Math.abs(target - current) < 0.05) current = target;
     content.style.transform = `translate3d(0, ${-current}px, 0)`;
+    ScrollTrigger.update();
   });
 
   ScrollTrigger.scrollerProxy(document.body, {
@@ -560,7 +580,8 @@ if (st && fine && !reduced) {
     },
     getBoundingClientRect() {
       return { top: 0, left: 0, width: innerWidth, height: innerHeight };
-    }
+    },
+    pinType: content.style.transform ? "transform" : "fixed"
   });
   ScrollTrigger.defaults({ scroller: document.body });
   ScrollTrigger.addEventListener('refresh', setHeight);
@@ -637,7 +658,7 @@ const track = document.getElementById('worksTrack');
 const pin = document.getElementById('worksPin');
 const bar = document.getElementById('worksBar');
 if (st && !reduced && innerWidth > 980) {
-  const getDist = () => track.scrollWidth - innerWidth + 64;
+  const getDist = () => Math.max(0, track.scrollWidth - pin.clientWidth);
   const tween = gsap.to(track, {
     x: () => -getDist(),
     ease: 'none',
@@ -754,6 +775,19 @@ const tickClock = () => {
 };
 tickClock(); setInterval(tickClock, 30000);
 document.getElementById('yr').textContent = new Date().getFullYear();
+
+/* ============ THEME TOGGLE ============ */
+const html = document.documentElement;
+const toggle = document.getElementById('themeToggle');
+const saved = localStorage.getItem('theme');
+if (saved) html.setAttribute('data-theme', saved);
+toggle.textContent = html.getAttribute('data-theme') === 'light' ? '[Dark]' : '[Light]';
+toggle.addEventListener('click', () => {
+  const next = html.getAttribute('data-theme') === 'light' ? '' : 'light';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  toggle.textContent = next === 'light' ? '[Dark]' : '[Light]';
+});
 </script>
 </body>
 </html>
