@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Miha Bratina — Digital Alchemist & Creative Developer</title>
+<meta name="description" content="Miha Bratina. Digital alchemist and creative developer. Web tools, simulators, and 3D environments built in Slovenia, shipped worldwide.">
+<meta property="og:title" content="Miha Bratina — Digital Alchemist & Creative Developer">
+<meta property="og:description" content="Web tools, simulators, and 3D environments. Logic meets design.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --ink:#0D0D0D;
+  --paper:#F5F5F5;
+  --paper-dim:#9a9a96;
+  --paper-faint:#4a4a48;
+  --lime:#C8FF2E;
+  --lime-dim:rgba(200,255,46,.12);
+  --line:#232321;
+  --serif:'Fraunces',serif;
+  --mono:'JetBrains Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scrollbar-width:thin;scrollbar-color:var(--line) var(--ink)}
+body{
+  background:var(--ink);color:var(--paper);
+  font-family:var(--mono);font-size:14px;line-height:1.6;
+  overflow-x:hidden;
+}
+::selection{background:var(--lime);color:var(--ink)}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--lime);outline-offset:4px}
+img{display:block;max-width:100%}
+
+/* ============ CURSOR ============ */
+.cursor{
+  position:fixed;top:0;left:0;z-index:9999;pointer-events:none;
+  width:12px;height:12px;border-radius:50%;background:var(--lime);
+  transform:translate(-50%,-50%);
+  mix-blend-mode:difference;
+  display:flex;align-items:center;justify-content:center;
+  transition:width .35s cubic-bezier(.6,0,.2,1),height .35s cubic-bezier(.6,0,.2,1),background .35s;
+}
+.cursor span{
+  font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.15em;
+  color:var(--ink);opacity:0;transition:opacity .2s;white-space:nowrap;
+}
+.cursor.is-view{width:84px;height:84px;mix-blend-mode:normal}
+.cursor.is-view span{opacity:1}
+.cursor.is-link{width:44px;height:44px;background:transparent;border:1px solid var(--lime);mix-blend-mode:normal}
+@media (hover:none),(pointer:coarse){.cursor{display:none}}
+body.fine-pointer,body.fine-pointer a,body.fine-pointer button{cursor:none}
+
+/* ============ NAV ============ */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:22px 32px;mix-blend-mode:difference;
+}
+.nav-logo{font-family:var(--mono);font-weight:700;font-size:13px;letter-spacing:.06em}
+.nav-logo em{font-family:var(--serif);font-style:italic;font-weight:400;color:var(--lime);mix-blend-mode:normal}
+.nav-right{display:flex;gap:28px;align-items:center}
+.nav-right a{font-size:11px;letter-spacing:.14em;text-transform:uppercase;position:relative}
+.nav-right a::after{
+  content:"";position:absolute;left:0;bottom:-4px;height:1px;width:0;background:var(--paper);
+  transition:width .3s cubic-bezier(.6,0,.2,1);
+}
+.nav-right a:hover::after{width:100%}
+.nav-clock{font-size:10px;letter-spacing:.1em;color:var(--paper);opacity:.5}
+
+/* ============ HERO ============ */
+.hero{
+  min-height:100vh;display:grid;grid-template-columns:1.25fr 1fr;
+  align-items:center;padding:120px 32px 60px;gap:24px;position:relative;
+}
+.hero-kick{
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--paper-dim);
+  margin-bottom:28px;display:flex;align-items:center;gap:14px;
+}
+.hero-kick::before{content:"";width:40px;height:1px;background:var(--lime)}
+.hero h1{
+  font-family:var(--serif);font-weight:300;
+  font-size:clamp(44px,6.6vw,96px);line-height:1.02;letter-spacing:-.02em;
+}
+.hero h1 .ln{display:block;overflow:hidden}
+.hero h1 .ln > span{display:inline-block;transform:translateY(110%)}
+.hero h1 em{font-style:italic;font-weight:400;color:var(--lime)}
+.hero h1 strong{font-weight:700}
+.hero-sub{
+  margin-top:30px;max-width:440px;color:var(--paper-dim);font-size:13px;line-height:1.8;
+}
+.hero-sub b{color:var(--paper);font-weight:500}
+.hero-cta-row{margin-top:42px;display:flex;gap:22px;align-items:center;flex-wrap:wrap}
+.btn-magnet{
+  position:relative;display:inline-flex;align-items:center;gap:14px;
+  padding:18px 34px;border:1px solid var(--paper-faint);border-radius:60px;
+  font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+  background:transparent;color:var(--paper);overflow:hidden;
+  transition:border-color .3s;
+}
+.btn-magnet .fill{
+  position:absolute;inset:0;background:var(--lime);border-radius:60px;
+  transform:scaleY(0);transform-origin:bottom;transition:transform .45s cubic-bezier(.7,0,.2,1);
+}
+.btn-magnet > span{position:relative;z-index:1;transition:color .3s}
+.btn-magnet:hover .fill{transform:scaleY(1)}
+.btn-magnet:hover{border-color:var(--lime)}
+.btn-magnet:hover > span{color:var(--ink)}
+.hero-ghost{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--paper-dim);border-bottom:1px solid var(--line);padding-bottom:4px}
+.hero-ghost:hover{color:var(--lime);border-color:var(--lime)}
+.hero-visual{position:relative;height:min(520px,60vh)}
+.hero-visual canvas{display:block;width:100%;height:100%}
+.hero-visual .frame-tag{
+  position:absolute;bottom:0;right:0;font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--paper-faint);
+}
+.hero-edge{
+  position:absolute;bottom:34px;left:32px;right:32px;display:flex;justify-content:space-between;
+  font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--paper-faint);
+}
+.hero-edge .blink{color:var(--lime);animation:blink 1.4s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* ============ SECTION CHROME ============ */
+section{position:relative}
+.sec-head{
+  display:flex;align-items:baseline;gap:20px;
+  padding:0 32px;margin-bottom:48px;
+}
+.sec-index{font-size:11px;letter-spacing:.2em;color:var(--lime)}
+.sec-title{font-family:var(--serif);font-weight:300;font-size:clamp(30px,4vw,52px);letter-spacing:-.02em}
+.sec-title em{font-style:italic;color:var(--paper-dim)}
+.sec-rule{flex:1;height:1px;background:var(--line)}
+
+/* ============ WORKS — HORIZONTAL RAIL ============ */
+.works{padding:110px 0 0}
+.works-pin{overflow:hidden}
+.works-track{
+  display:flex;gap:28px;padding:0 32px;will-change:transform;width:max-content;
+}
+.work{
+  position:relative;flex:0 0 min(680px,82vw);
+  border:1px solid var(--line);background:#111110;
+  overflow:hidden;
+}
+.work-thumb{
+  position:relative;aspect-ratio:16/9.5;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.work-thumb .art{
+  position:absolute;inset:0;transition:transform .8s cubic-bezier(.4,0,.2,1);
+}
+.work:hover .work-thumb .art{transform:scale(1.06)}
+.work-thumb .wave{
+  position:absolute;inset:-20%;opacity:0;pointer-events:none;
+  background:radial-gradient(ellipse 50% 38% at 50% 50%,var(--lime-dim) 0%,transparent 70%);
+  transition:opacity .6s;
+  animation:waveDrift 7s ease-in-out infinite alternate;
+}
+@keyframes waveDrift{from{transform:translate(-4%,-3%) rotate(-2deg)}to{transform:translate(4%,3%) rotate(2deg)}}
+.work:hover .wave{opacity:1}
+.work-thumb h3{
+  position:relative;z-index:2;font-family:var(--serif);font-weight:300;font-style:italic;
+  font-size:clamp(34px,4.4vw,60px);color:var(--paper);letter-spacing:-.01em;
+  text-align:center;padding:0 24px;
+  transition:transform .6s cubic-bezier(.4,0,.2,1);
+}
+.work:hover .work-thumb h3{transform:scale(1.03)}
+/* generated art per project */
+.art-01{background:
+  linear-gradient(160deg,#161614 0%,#0D0D0D 60%),
+  repeating-linear-gradient(90deg,transparent 0 46px,rgba(200,255,46,.06) 46px 47px)}
+.art-02{background:
+  radial-gradient(circle at 70% 30%,rgba(200,255,46,.10),transparent 50%),
+  repeating-radial-gradient(circle at 70% 30%,transparent 0 38px,rgba(245,245,245,.04) 38px 39px),#101010}
+.art-03{background:
+  repeating-linear-gradient(0deg,transparent 0 30px,rgba(245,245,245,.045) 30px 31px),
+  linear-gradient(200deg,#141412,#0D0D0D)}
+.art-04{background:
+  conic-gradient(from 200deg at 30% 70%,rgba(200,255,46,.12),transparent 30%),
+  repeating-linear-gradient(45deg,transparent 0 52px,rgba(245,245,245,.035) 52px 53px),#0f0f0e}
+.art-05{background:
+  radial-gradient(ellipse at 50% 100%,rgba(200,255,46,.14),transparent 55%),
+  repeating-linear-gradient(90deg,transparent 0 8px,rgba(245,245,245,.03) 8px 9px),#101010}
+.work-meta{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:18px 22px;border-top:1px solid var(--line);
+}
+.work-meta .wm-left{display:flex;flex-direction:column;gap:4px}
+.work-meta .wm-num{font-size:10px;letter-spacing:.2em;color:var(--lime)}
+.work-meta .wm-cat{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--paper-dim)}
+.work-meta .wm-link{
+  font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  display:flex;align-items:center;gap:8px;
+}
+.work-meta .wm-link .arr{transition:transform .3s}
+.work:hover .wm-link .arr{transform:translate(4px,-4px)}
+.works-progress{
+  margin:34px 32px 0;height:1px;background:var(--line);position:relative;
+}
+.works-progress .bar{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--lime)}
+
+/* ============ ABOUT — BENTO ============ */
+.about{padding:130px 0 30px}
+.bento{
+  display:grid;gap:14px;padding:0 32px;
+  grid-template-columns:repeat(12,1fr);grid-auto-rows:minmax(120px,auto);
+}
+.tile{
+  border:1px solid var(--line);background:#111110;padding:26px 28px;
+  position:relative;overflow:hidden;
+  transition:border-color .3s;
+}
+.tile:hover{border-color:var(--paper-faint)}
+.tile-label{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--lime);margin-bottom:16px}
+.t-bio{grid-column:span 7;grid-row:span 2}
+.t-bio p{
+  font-family:var(--serif);font-weight:300;font-size:clamp(19px,2vw,26px);
+  line-height:1.45;letter-spacing:-.01em;color:var(--paper);
+}
+.t-bio p em{font-style:italic;color:var(--lime)}
+.t-bio .bio-foot{margin-top:22px;font-family:var(--mono);font-size:11px;color:var(--paper-dim);letter-spacing:.08em}
+.t-stack{grid-column:span 5;grid-row:span 1;display:flex;flex-direction:column;justify-content:center}
+.marquee{overflow:hidden;white-space:nowrap;mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.marquee-inner{display:inline-block;animation:scrollX 22s linear infinite;padding-right:40px}
+.marquee:hover .marquee-inner{animation-play-state:paused}
+.marquee-inner span{
+  font-size:12px;letter-spacing:.1em;color:var(--paper-dim);margin-right:34px;
+}
+.marquee-inner span i{font-style:normal;color:var(--lime);margin-right:10px}
+@keyframes scrollX{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.t-twin{grid-column:span 5;grid-row:span 1;display:flex;flex-direction:column;justify-content:space-between;gap:18px}
+.t-twin p{font-size:12px;color:var(--paper-dim);line-height:1.7}
+.twin-btn{
+  align-self:flex-start;display:inline-flex;align-items:center;gap:12px;
+  border:1px solid var(--lime);color:var(--lime);background:transparent;
+  font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  padding:13px 24px;border-radius:50px;transition:background .3s,color .3s;
+}
+.twin-btn:hover{background:var(--lime);color:var(--ink)}
+.twin-btn .dot{width:7px;height:7px;border-radius:50%;background:currentColor;animation:blink 1.6s steps(2) infinite}
+.t-loc{grid-column:span 4}
+.t-loc .big{font-family:var(--serif);font-weight:300;font-size:26px;letter-spacing:-.01em;margin-bottom:6px}
+.t-loc .sm{font-size:11px;color:var(--paper-dim);letter-spacing:.1em}
+.t-count{grid-column:span 4;display:flex;gap:30px;align-items:center}
+.t-count .cnt b{display:block;font-family:var(--serif);font-weight:700;font-size:34px;color:var(--lime)}
+.t-count .cnt span{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--paper-dim)}
+.t-aside{grid-column:span 4;display:flex;align-items:center}
+.t-aside p{font-family:var(--serif);font-style:italic;font-weight:400;font-size:17px;color:var(--paper-dim);line-height:1.5}
+.t-aside p b{color:var(--paper);font-weight:500}
+
+/* ============ FOOTER ============ */
+.footer{
+  min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;
+  padding:140px 32px 28px;position:relative;overflow:hidden;
+}
+.foot-mega{
+  font-family:var(--serif);font-weight:700;letter-spacing:-.03em;line-height:.92;
+  font-size:clamp(58px,11.5vw,180px);text-transform:uppercase;
+}
+.foot-mega .row{display:block;overflow:hidden}
+.foot-mega .row > span{display:inline-block;transform:translateY(105%)}
+.foot-mega em{font-style:italic;font-weight:400;color:var(--lime)}
+.foot-grid{
+  display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:40px;
+  margin-top:70px;padding-top:36px;border-top:1px solid var(--line);
+}
+.foot-col h4{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--paper-faint);margin-bottom:18px}
+.cform{display:flex;flex-direction:column;gap:0}
+.cform input,.cform textarea{
+  background:transparent;border:0;border-bottom:1px solid var(--line);
+  color:var(--paper);font-family:var(--mono);font-size:13px;
+  padding:14px 0;outline:none;resize:none;
+  transition:border-color .3s;
+}
+.cform input::placeholder,.cform textarea::placeholder{color:var(--paper-faint)}
+.cform input:focus,.cform textarea:focus{border-color:var(--lime)}
+.cform button{
+  margin-top:26px;align-self:flex-start;
+}
+.foot-links{display:flex;flex-direction:column;gap:13px}
+.foot-links a{
+  font-size:12px;letter-spacing:.1em;display:flex;justify-content:space-between;
+  border-bottom:1px solid transparent;padding-bottom:3px;max-width:240px;
+  transition:color .25s;
+}
+.foot-links a:hover{color:var(--lime)}
+.foot-links a i{font-style:normal;color:var(--paper-faint);font-size:10px}
+.foot-base{
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
+  margin-top:60px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--paper-faint);
+}
+.foot-base .lime{color:var(--lime)}
+
+/* ============ REVEAL UTILITY ============ */
+.rv{opacity:0;transform:translateY(34px)}
+.rv-l{opacity:0;transform:translateX(-30px)}
+.rv-r{opacity:0;transform:translateX(30px)}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width:980px){
+  .hero{grid-template-columns:1fr;padding-top:110px}
+  .hero-visual{display:none}
+  .t-bio{grid-column:span 12}
+  .t-stack,.t-twin{grid-column:span 12}
+  .t-loc,.t-count,.t-aside{grid-column:span 6}
+  .foot-grid{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  nav{padding:18px 20px}
+  .nav-right a:not(:last-child){display:none}
+  .hero,.sec-head{padding-left:20px;padding-right:20px}
+  .works-track{padding:0 20px}
+  .bento{padding:0 20px}
+  .footer{padding-left:20px;padding-right:20px}
+  .t-loc,.t-count,.t-aside{grid-column:span 12}
+  .hero-edge{left:20px;right:20px}
+  .works-progress{margin-left:20px;margin-right:20px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+  .rv,.rv-l,.rv-r,.hero h1 .ln > span,.foot-mega .row > span{opacity:1!important;transform:none!important}
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" aria-hidden="true"><span>VIEW</span></div>
+
+<nav>
+  <a href="#top" class="nav-logo" data-link>miha<em>.</em>bratina <em>— digital alchemist</em></a>
+  <div class="nav-right">
+    <a href="#works" data-link>Works</a>
+    <a href="#about" data-link>About</a>
+    <a href="#contact" data-link>Contact</a>
+    <span class="nav-clock" id="clock">SI — 00:00</span>
+  </div>
+</nav>
+
+<div id="smooth-wrapper"><div id="smooth-content">
+
+<!-- ============ HERO ============ -->
+<header class="hero" id="top">
+  <div>
+    <p class="hero-kick">Nova Gorica, Slovenia — worldwide</p>
+    <h1 aria-label="Hi, I'm Miha — Digital Alchemist and Creative Developer.">
+      <span class="ln"><span>Hi, I'm <strong>Miha</strong> —</span></span>
+      <span class="ln"><span><em>digital alchemist</em></span></span>
+      <span class="ln"><span>&amp; creative <strong>developer</strong>.</span></span>
+    </h1>
+    <p class="hero-sub rv">I transmute <b>backend logic</b> into living web tools and <b>raw geometry</b> into cinematic 3D worlds. Four apps shipped and live. Simulators, systems, renders — built on abundance.</p>
+    <div class="hero-cta-row rv">
+      <a href="#works" class="btn-magnet" data-magnet data-link><span>View selected works</span><div class="fill"></div></a>
+      <a href="#contact" class="hero-ghost" data-link>Start a project ↗</a>
+    </div>
+  </div>
+  <div class="hero-visual" id="webgl" aria-hidden="true">
+    <span class="frame-tag">WEBGL — live asset / reacts to cursor</span>
+  </div>
+  <div class="hero-edge">
+    <span>scroll <span class="blink">▼</span></span>
+    <span>portfolio — MMXXVI</span>
+  </div>
+</header>
+
+<!-- ============ SELECTED WORKS ============ -->
+<section class="works" id="works">
+  <div class="sec-head">
+    <span class="sec-index">01</span>
+    <h2 class="sec-title">Selected <em>works</em></h2>
+    <span class="sec-rule"></span>
+  </div>
+  <div class="works-pin" id="worksPin">
+    <div class="works-track" id="worksTrack">
+
+      <a class="work" href="https://nuffyofc.github.io/pocketmentorxyz/" target="_blank" rel="noopener" data-view>
+        <div class="work-thumb"><div class="art art-01"></div><div class="wave"></div><h3>Mentor AI</h3></div>
+        <div class="work-meta">
+          <div class="wm-left"><span class="wm-num">W.01</span><span class="wm-cat">AI companion — live app</span></div>
+          <span class="wm-link">Open <span class="arr">↗</span></span>
+        </div>
+      </a>
+
+      <a class="work" href="https://nuffyofc.github.io/biplandingpage/" target="_blank" rel="noopener" data-view>
+        <div class="work-thumb"><div class="art art-02"></div><div class="wave"></div><h3>Bippy</h3></div>
+        <div class="work-meta">
+          <div class="wm-left"><span class="wm-num">W.02</span><span class="wm-cat">Erasmus city platform — live app</span></div>
+          <span class="wm-link">Open <span class="arr">↗</span></span>
+        </div>
+      </a>
+
+      <a class="work" href="https://nuffyofc.github.io/rulesforlife/" target="_blank" rel="noopener" data-view>
+        <div class="work-thumb"><div class="art art-03"></div><div class="wave"></div><h3>ActionScroll</h3></div>
+        <div class="work-meta">
+          <div class="wm-left"><span class="wm-num">W.03</span><span class="wm-cat">Daily rules dashboard — live app</span></div>
+          <span class="wm-link">Open <span class="arr">↗</span></span>
+        </div>
+      </a>
+
+      <a class="work" href="https://lunar-katong-gnpn.pagedrop.io/" target="_blank" rel="noopener" data-view>
+        <div class="work-thumb"><div class="art art-04"></div><div class="wave"></div><h3>SLO AI</h3></div>
+        <div class="work-meta">
+          <div class="wm-left"><span class="wm-num">W.04</span><span class="wm-cat">Strategy guide — live portal</span></div>
+          <span class="wm-link">Open <span class="arr">↗</span></span>
+        </div>
+      </a>
+
+      <a class="work" href="https://github.com/nuffyofc/geopolitik-crisis-economy" target="_blank" rel="noopener" data-view>
+        <div class="work-thumb"><div class="art art-05"></div><div class="wave"></div><h3>Geopolitik</h3></div>
+        <div class="work-meta">
+          <div class="wm-left"><span class="wm-num">W.05</span><span class="wm-cat">Crisis economy simulator — repo</span></div>
+          <span class="wm-link">Open <span class="arr">↗</span></span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+  <div class="works-progress"><div class="bar" id="worksBar"></div></div>
+</section>
+
+<!-- ============ ABOUT — BENTO ============ -->
+<section class="about" id="about">
+  <div class="sec-head">
+    <span class="sec-index">02</span>
+    <h2 class="sec-title">The <em>operating system</em></h2>
+    <span class="sec-rule"></span>
+  </div>
+  <div class="bento">
+
+    <div class="tile t-bio rv">
+      <p class="tile-label">Bio — unfiltered</p>
+      <p>Half my brain writes <em>backend logic</em>, the other half lights <em>Blender scenes</em> at 2am. Between them sit four shipped apps, two simulators, a sticker empire, and a firm belief that abundance is a system you <em>build</em> — not a thing you wait for.</p>
+      <p class="bio-foot">// also makes beats on SoundCloud. nobody's perfect.</p>
+    </div>
+
+    <div class="tile t-stack rv-r">
+      <p class="tile-label">Tech stack — in rotation</p>
+      <div class="marquee" aria-label="Technology stack">
+        <div class="marquee-inner">
+          <span><i>◆</i>JavaScript</span><span><i>◆</i>Python</span><span><i>◆</i>Three.js</span><span><i>◆</i>Blender</span><span><i>◆</i>GSAP</span><span><i>◆</i>HTML/CSS</span><span><i>◆</i>Backend logic</span><span><i>◆</i>Strategy sim</span><span><i>◆</i>Vector art</span><span><i>◆</i>Git</span>
+          <span><i>◆</i>JavaScript</span><span><i>◆</i>Python</span><span><i>◆</i>Three.js</span><span><i>◆</i>Blender</span><span><i>◆</i>GSAP</span><span><i>◆</i>HTML/CSS</span><span><i>◆</i>Backend logic</span><span><i>◆</i>Strategy sim</span><span><i>◆</i>Vector art</span><span><i>◆</i>Git</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tile t-twin rv-r">
+      <p class="tile-label">Experiment</p>
+      <p>An AI twin trained on my mentoring app logic. Ask it anything about how I build.</p>
+      <a class="twin-btn" href="https://nuffyofc.github.io/pocketmentorxyz/" target="_blank" rel="noopener" data-link><span class="dot"></span>Chat with my AI twin</a>
+    </div>
+
+    <div class="tile t-loc rv">
+      <p class="tile-label">Coordinates</p>
+      <p class="big">Nova Gorica, SI</p>
+      <p class="sm">45.95° N, 13.64° E — remote worldwide</p>
+    </div>
+
+    <div class="tile t-count rv">
+      <div class="cnt"><b data-count="4">0</b><span>live apps</span></div>
+      <div class="cnt"><b data-count="2">0</b><span>simulators</span></div>
+      <div class="cnt"><b data-count="6">0</b><span>platforms</span></div>
+    </div>
+
+    <div class="tile t-aside rv">
+      <p>"<b>Built upon abundance.</b> Operating at the balance point of logical execution and visual design."</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer" id="contact">
+  <h2 class="foot-mega" aria-label="Let's build something.">
+    <span class="row"><span>Let's <em>build</em></span></span>
+    <span class="row"><span>something.</span></span>
+  </h2>
+
+  <div class="foot-grid">
+    <div class="foot-col rv">
+      <h4>Send a signal</h4>
+      <form class="cform" id="cform">
+        <input type="text" name="name" placeholder="Your name" autocomplete="name" required>
+        <input type="email" name="email" placeholder="Your email" autocomplete="email" required>
+        <textarea name="msg" rows="3" placeholder="What are we building?" required></textarea>
+        <button type="submit" class="btn-magnet" data-magnet><span>Send message</span><div class="fill"></div></button>
+      </form>
+    </div>
+    <div class="foot-col rv">
+      <h4>Networks</h4>
+      <div class="foot-links">
+        <a href="https://github.com/nuffyofc" target="_blank" rel="noopener" data-link>GitHub <i>nuffyofc</i></a>
+        <a href="https://www.linkedin.com/in/mihabratina" target="_blank" rel="noopener" data-link>LinkedIn <i>mihabratina</i></a>
+        <a href="https://x.com/bratinov" target="_blank" rel="noopener" data-link>X / Twitter <i>bratinov</i></a>
+        <a href="https://www.instagram.com/werelivinginabundance" target="_blank" rel="noopener" data-link>Instagram <i>3D renders</i></a>
+        <a href="https://www.tiktok.com/@werelivinginabundance" target="_blank" rel="noopener" data-link>TikTok <i>abundance</i></a>
+        <a href="https://soundcloud.com/nuffyofc" target="_blank" rel="noopener" data-link>SoundCloud <i>nuffyofc</i></a>
+      </div>
+    </div>
+    <div class="foot-col rv">
+      <h4>Elsewhere</h4>
+      <div class="foot-links">
+        <a href="https://github.com/hisoftjuniordev/HTML" target="_blank" rel="noopener" data-link>Trading sims <i>repo</i></a>
+        <a href="https://www.redbubble.com/shop/csgo+crown+stickers" target="_blank" rel="noopener" data-link>CS workshop <i>Redbubble</i></a>
+        <a href="https://nuffyofc.github.io/pocketmentorxyz/" target="_blank" rel="noopener" data-link>Mentor AI <i>live</i></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot-base">
+    <span>© <span id="yr">2026</span> Miha Bratina — all systems live</span>
+    <span class="lime">// operating at the balance point</span>
+    <span>Made in Slovenia. Rendered everywhere.</span>
+  </div>
+</footer>
+
+</div></div><!-- /smooth -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+if (fine) document.body.classList.add('fine-pointer');
+
+/* ============ INERTIAL SMOOTH SCROLL (Locomotive-style lerp) ============ */
+let st = false;
+if (window.gsap && window.ScrollTrigger) { gsap.registerPlugin(ScrollTrigger); st = true; }
+
+const content = document.getElementById('smooth-content');
+const wrapper = document.getElementById('smooth-wrapper');
+let smooth = false;
+
+if (st && fine && !reduced) {
+  smooth = true;
+  let current = 0, target = 0;
+  const ease = 0.085;
+  wrapper.style.position = 'fixed';
+  wrapper.style.inset = '0';
+  wrapper.style.overflow = 'hidden';
+  const setHeight = () => { document.body.style.height = content.scrollHeight + 'px'; };
+  setHeight();
+  new ResizeObserver(setHeight).observe(content);
+
+  addEventListener('scroll', () => { target = scrollY; });
+  gsap.ticker.add(() => {
+    current += (target - current) * ease;
+    if (Math.abs(target - current) < 0.05) current = target;
+    content.style.transform = `translate3d(0, ${-current}px, 0)`;
+  });
+
+  ScrollTrigger.scrollerProxy(document.body, {
+    scrollTop(value) {
+      if (arguments.length) { scrollTo(0, value); }
+      return current;
+    },
+    getBoundingClientRect() {
+      return { top: 0, left: 0, width: innerWidth, height: innerHeight };
+    }
+  });
+  ScrollTrigger.defaults({ scroller: document.body });
+  ScrollTrigger.addEventListener('refresh', setHeight);
+}
+
+/* ============ CUSTOM MORPHING CURSOR ============ */
+if (fine) {
+  const cur = document.querySelector('.cursor');
+  let mx = innerWidth/2, my = innerHeight/2, cx = mx, cy = my;
+  addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  (function loop(){
+    cx += (mx - cx) * 0.2; cy += (my - cy) * 0.2;
+    cur.style.left = cx + 'px'; cur.style.top = cy + 'px';
+    requestAnimationFrame(loop);
+  })();
+  document.querySelectorAll('[data-view]').forEach(el => {
+    el.addEventListener('mouseenter', () => cur.classList.add('is-view'));
+    el.addEventListener('mouseleave', () => cur.classList.remove('is-view'));
+  });
+  document.querySelectorAll('[data-link], button').forEach(el => {
+    el.addEventListener('mouseenter', () => cur.classList.add('is-link'));
+    el.addEventListener('mouseleave', () => cur.classList.remove('is-link'));
+  });
+}
+
+/* ============ MAGNETIC BUTTONS ============ */
+if (fine && !reduced) {
+  document.querySelectorAll('[data-magnet]').forEach(btn => {
+    btn.addEventListener('mousemove', e => {
+      const r = btn.getBoundingClientRect();
+      const dx = e.clientX - (r.left + r.width/2);
+      const dy = e.clientY - (r.top + r.height/2);
+      gsap.to(btn, { x: dx * 0.32, y: dy * 0.32, duration: 0.4, ease: 'power2.out' });
+    });
+    btn.addEventListener('mouseleave', () => {
+      gsap.to(btn, { x: 0, y: 0, duration: 0.7, ease: 'elastic.out(1, 0.35)' });
+    });
+  });
+}
+
+/* ============ HERO KINETIC TEXT ============ */
+if (st && !reduced) {
+  gsap.to('.hero h1 .ln > span', {
+    y: 0, duration: 1.1, stagger: 0.13, ease: 'power4.out', delay: 0.2
+  });
+  gsap.to('.hero .rv', { opacity: 1, y: 0, duration: 0.9, stagger: 0.15, ease: 'power2.out', delay: 0.9 });
+} else {
+  document.querySelectorAll('.hero h1 .ln > span').forEach(s => s.style.transform = 'none');
+  document.querySelectorAll('.hero .rv').forEach(s => { s.style.opacity = 1; s.style.transform = 'none'; });
+}
+
+/* ============ SCROLL REVEALS (asymmetric) ============ */
+if (st && !reduced) {
+  document.querySelectorAll('section .rv, footer .rv').forEach((el, i) => {
+    gsap.to(el, {
+      opacity: 1, y: 0, duration: 0.9, ease: 'power3.out', delay: (i % 3) * 0.08,
+      scrollTrigger: { trigger: el, start: 'top 86%' }
+    });
+  });
+  document.querySelectorAll('.rv-l').forEach(el => {
+    gsap.to(el, { opacity: 1, x: 0, duration: 0.9, ease: 'power3.out',
+      scrollTrigger: { trigger: el, start: 'top 86%' } });
+  });
+  document.querySelectorAll('.rv-r').forEach(el => {
+    gsap.to(el, { opacity: 1, x: 0, duration: 0.9, ease: 'power3.out',
+      scrollTrigger: { trigger: el, start: 'top 86%' } });
+  });
+} else {
+  document.querySelectorAll('.rv,.rv-l,.rv-r').forEach(el => { el.style.opacity = 1; el.style.transform = 'none'; });
+}
+
+/* ============ HORIZONTAL WORKS RAIL ============ */
+const track = document.getElementById('worksTrack');
+const pin = document.getElementById('worksPin');
+const bar = document.getElementById('worksBar');
+if (st && !reduced && innerWidth > 980) {
+  const getDist = () => track.scrollWidth - innerWidth + 64;
+  const tween = gsap.to(track, {
+    x: () => -getDist(),
+    ease: 'none',
+    scrollTrigger: {
+      trigger: pin, start: 'top 12%', end: () => '+=' + getDist(),
+      pin: true, scrub: 0.6, invalidateOnRefresh: true,
+      onUpdate: self => { bar.style.width = (self.progress * 100) + '%'; }
+    }
+  });
+} else {
+  // mobile: native horizontal swipe
+  pin.style.overflowX = 'auto';
+  track.style.width = 'max-content';
+  pin.addEventListener('scroll', () => {
+    const max = track.scrollWidth - pin.clientWidth;
+    bar.style.width = (max > 0 ? (pin.scrollLeft / max) * 100 : 0) + '%';
+  });
+}
+
+/* ============ FOOTER MEGA TEXT ============ */
+if (st && !reduced) {
+  gsap.to('.foot-mega .row > span', {
+    y: 0, duration: 1.1, stagger: 0.14, ease: 'power4.out',
+    scrollTrigger: { trigger: '.footer', start: 'top 65%' }
+  });
+} else {
+  document.querySelectorAll('.foot-mega .row > span').forEach(s => s.style.transform = 'none');
+}
+
+/* ============ COUNTERS ============ */
+if (st && !reduced) {
+  document.querySelectorAll('[data-count]').forEach(el => {
+    const end = +el.dataset.count;
+    ScrollTrigger.create({
+      trigger: el, start: 'top 88%', once: true,
+      onEnter: () => gsap.to(el, {
+        innerText: end, duration: 1.4, snap: { innerText: 1 }, ease: 'power2.out'
+      })
+    });
+  });
+} else {
+  document.querySelectorAll('[data-count]').forEach(el => el.textContent = el.dataset.count);
+}
+
+/* ============ THREE.JS HERO ASSET ============ */
+const box = document.getElementById('webgl');
+if (window.THREE && fine && innerWidth > 980 && box) {
+  const scene = new THREE.Scene();
+  const cam = new THREE.PerspectiveCamera(40, box.clientWidth / box.clientHeight, 0.1, 100);
+  cam.position.z = 6;
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setSize(box.clientWidth, box.clientHeight);
+  box.prepend(renderer.domElement);
+
+  const group = new THREE.Group();
+  const knot = new THREE.Mesh(
+    new THREE.TorusKnotGeometry(1.35, 0.34, 140, 18, 2, 3),
+    new THREE.MeshBasicMaterial({ color: 0xC8FF2E, wireframe: true, transparent: true, opacity: 0.5 })
+  );
+  const halo = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(2.4, 0),
+    new THREE.MeshBasicMaterial({ color: 0xF5F5F5, wireframe: true, transparent: true, opacity: 0.07 })
+  );
+  group.add(knot, halo);
+  scene.add(group);
+
+  let tx = 0, ty = 0;
+  addEventListener('mousemove', e => {
+    tx = (e.clientX / innerWidth - 0.5);
+    ty = (e.clientY / innerHeight - 0.5);
+  });
+
+  (function anim(){
+    requestAnimationFrame(anim);
+    if (!reduced) {
+      group.rotation.y += 0.0032;
+      group.rotation.x += 0.0009;
+      group.rotation.y += (tx * 0.5 - group.rotation.y % 1) * 0.012;
+      group.position.y = Math.sin(performance.now() * 0.0008) * 0.12;
+      cam.position.x += (tx * 0.9 - cam.position.x) * 0.05;
+      cam.position.y += (-ty * 0.9 - cam.position.y) * 0.05;
+      cam.lookAt(0, 0, 0);
+    }
+    renderer.render(scene, cam);
+  })();
+
+  addEventListener('resize', () => {
+    if (!box.clientWidth) return;
+    cam.aspect = box.clientWidth / box.clientHeight;
+    cam.updateProjectionMatrix();
+    renderer.setSize(box.clientWidth, box.clientHeight);
+  });
+}
+
+/* ============ CONTACT FORM (mailto handoff) ============ */
+document.getElementById('cform').addEventListener('submit', e => {
+  e.preventDefault();
+  const f = e.target;
+  const subject = encodeURIComponent('Project inquiry — ' + f.name.value);
+  const body = encodeURIComponent(f.msg.value + '\n\n— ' + f.name.value + ' (' + f.email.value + ')');
+  location.href = `mailto:?subject=${subject}&body=${body}`;
+  const btn = f.querySelector('button span');
+  btn.textContent = 'Opening your mail app…';
+  setTimeout(() => btn.textContent = 'Send message', 2500);
+});
+
+/* ============ CLOCK + YEAR ============ */
+const clock = document.getElementById('clock');
+const tickClock = () => {
+  clock.textContent = 'SI — ' + new Intl.DateTimeFormat('en-GB', {
+    hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Ljubljana'
+  }).format(new Date());
+};
+tickClock(); setInterval(tickClock, 30000);
+document.getElementById('yr').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
