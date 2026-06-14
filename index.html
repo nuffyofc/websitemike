@@ -96,6 +96,12 @@ nav{
 }
 .nav-right a:hover::after{width:100%}
 .nav-clock{font-size:10px;letter-spacing:.1em;color:var(--paper);opacity:.5}
+.nav-social{
+  background:var(--lime);color:var(--ink)!important;mix-blend-mode:normal!important;
+  border-radius:20px;padding:5px 16px;font-weight:700;transition:filter .25s,transform .25s;
+}
+.nav-social::after{display:none}
+.nav-social:hover{filter:brightness(1.12);transform:translateY(-1px)}
 .theme-btn{
   background:none;border:1px solid var(--paper-faint);border-radius:20px;
   color:var(--paper);font-family:var(--mono);font-size:10px;letter-spacing:.1em;
@@ -296,30 +302,10 @@ section{position:relative}
 .foot-mega .row > span{display:inline-block;transform:translateY(105%)}
 .foot-mega em{font-style:italic;font-weight:400;color:var(--lime)}
 .foot-grid{
-  display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:40px;
+  display:grid;grid-template-columns:1fr;gap:40px;
   margin-top:70px;padding-top:36px;border-top:1px solid var(--hue-blue);
 }
 .foot-col h4{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--paper-faint);margin-bottom:18px}
-.cform{display:flex;flex-direction:column;gap:0}
-.cform input,.cform textarea{
-  background:transparent;border:0;border-bottom:1px solid var(--line);
-  color:var(--paper);font-family:var(--mono);font-size:13px;
-  padding:14px 0;outline:none;resize:none;
-  transition:border-color .3s;
-}
-.cform input::placeholder,.cform textarea::placeholder{color:var(--paper-faint)}
-.cform input:focus,.cform textarea:focus{border-color:var(--lime)}
-.cform button{
-  margin-top:26px;align-self:flex-start;
-}
-.foot-links{display:flex;flex-direction:column;gap:13px}
-.foot-links a{
-  font-size:12px;letter-spacing:.1em;display:flex;justify-content:space-between;
-  border-bottom:1px solid transparent;padding-bottom:3px;max-width:240px;
-  transition:color .25s;
-}
-.foot-links a:hover{color:var(--hue-magenta)}
-.foot-links a i{font-style:normal;color:var(--paper-faint);font-size:10px}
 .foot-base{
   display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
   margin-top:60px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--paper-faint);
@@ -365,7 +351,7 @@ section{position:relative}
   <div class="nav-right">
     <a href="#works" data-link>Works</a>
     <a href="#about" data-link>About</a>
-    <a href="#contact" data-link>Contact</a>
+    <a href="https://linktr.ee/treebranches" target="_blank" rel="noopener" class="nav-social" data-link>Socials</a>
     <button class="theme-btn" id="themeToggle" data-link aria-label="Toggle theme">[Light]</button>
     <span class="nav-clock" id="clock">SI — 00:00</span>
   </div>
@@ -384,7 +370,7 @@ section{position:relative}
     <p class="hero-sub rv"><b>Full-stack</b> products shipped from Slovenia to the world.</p>
     <div class="hero-cta-row rv">
       <a href="#works" class="btn-magnet" data-magnet data-link><span>View selected works</span><div class="fill"></div></a>
-      <a href="#contact" class="hero-ghost" data-link>Start a project ↗</a>
+      <a href="https://linktr.ee/treebranches" target="_blank" rel="noopener" class="hero-ghost" data-link>Start a project ↗</a>
     </div>
   </div>
   <div class="hero-visual" id="webgl" aria-hidden="true">
@@ -506,19 +492,8 @@ section{position:relative}
 
   <div class="foot-grid">
     <div class="foot-col rv">
-      <h4>Send a signal</h4>
-      <form class="cform" id="cform">
-        <input type="text" name="name" placeholder="Your name" autocomplete="name" required>
-        <input type="email" name="email" placeholder="Your email" autocomplete="email" required>
-        <textarea name="msg" rows="3" placeholder="What are we building?" required></textarea>
-        <button type="submit" class="btn-magnet" data-magnet><span>Send message</span><div class="fill"></div></button>
-      </form>
-    </div>
-    <div class="foot-col rv">
       <h4>Networks</h4>
-      <div class="foot-links">
-        <a href="https://linktr.ee/treebranches" target="_blank" rel="noopener" data-link>Linktree <i>all socials</i></a>
-      </div>
+      <a href="https://linktr.ee/treebranches" target="_blank" rel="noopener" class="btn-magnet" data-magnet data-link><span>Linktree — all socials ↗</span><div class="fill"></div></a>
     </div>
 
   </div>
@@ -820,18 +795,6 @@ if (window.THREE && fine && innerWidth > 980 && box) {
     renderer.setSize(box.clientWidth, box.clientHeight);
   });
 }
-
-/* ============ CONTACT FORM ============ */
-document.getElementById('cform').addEventListener('submit', e => {
-  e.preventDefault();
-  const f = e.target;
-  const subject = encodeURIComponent('Project inquiry — ' + f.name.value);
-  const body = encodeURIComponent(f.msg.value + '\n\n— ' + f.name.value + ' (' + f.email.value + ')');
-  location.href = `mailto:?subject=${subject}&body=${body}`;
-  const btn = f.querySelector('button span');
-  btn.textContent = 'Opening your mail app…';
-  setTimeout(() => btn.textContent = 'Send message', 2500);
-});
 
 /* ============ CLOCK + YEAR ============ */
 const clock = document.getElementById('clock');
